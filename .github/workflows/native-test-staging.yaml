@@ -1,6 +1,8 @@
 name: test-quarkus-staging
 on:
   workflow_dispatch:
+permissions:
+  packages: write
 jobs:
   build:
     name: Build And Push
@@ -34,16 +36,14 @@ jobs:
       # build project
       - name: Build And Push To Github Package
         run: >
-          mvn clean package
-          -DskipTests
+          ./mvnw clean package 
           -Dnative 
           -Dquarkus.container-image.build=true
-          -Dquarkus.jib.platforms=linux/arm64
-          -Dquarkus.container-image.registry=ghcr.io
-          -Dquarkus.container-image.group=ghcr.io/kuoche1712003
-          -Dquarkus.container-image.name=native-test-staging
-          -Dquarkus.container-image.username=${{ github.actor }}
-          -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
-          -Dquarkus.container-image.build=true
-          -Dquarkus.container-image.push=true
+          -Dquarkus.native.container-build=true
+          -Dquarkus.container-image.push=true 
+          -Dquarkus.container-image.registry=ghcr.io 
+          -Dquarkus.container-image.group=kuoche1712003 
+          -Dquarkus.container-image.name=native-test-staging 
+          -Dquarkus.container-image.username=${{ github.actor }} 
+          -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }} 
           -Dquarkus.container-image.tag=${{ env.image-tag }}
