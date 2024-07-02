@@ -1,0 +1,48 @@
+name: test-quarkus-staging
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build And Push
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.output-tag.outputs.image-tag }}
+    steps:
+      # set Image Tag
+      - name: Set Image Tag
+        id: output-tag
+        run: |
+          echo "image-tag=$GITHUB_SHA" >> $GITHUB_ENV
+          echo "::set-output name=image-tag::$GITHUB_SHA"
+      # checkout repository
+      - uses: actions/checkout@v3
+      # set up JDK version
+      - name: Set up Graal 21
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # cache maven dependency
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      # build project
+      - name: Build And Push To Github Package
+        run: >
+          mvn clean package
+          -DskipTests
+          -Dnative 
+          -Dquarkus.jib.platforms=linux/arm64
+          -Dquarkus.container-image.registry=ghcr.io
+          -Dquarkus.container-image.group=ghcr.io/kuoche1712003
+          -Dquarkus.container-image.name=native-test-staging
+          -Dquarkus.container-image.username=${{ github.actor }}
+          -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
+          -Dquarkus.container-image.build=true
+          -Dquarkus.container-image.push=true
+          -Dquarkus.container-image.tag=${{ env.image-tag }}
