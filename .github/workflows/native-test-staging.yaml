@@ -37,6 +37,7 @@ jobs:
           mvn clean package
           -DskipTests
           -Dnative 
+          -Dquarkus.container-image.build=true
           -Dquarkus.jib.platforms=linux/arm64
           -Dquarkus.container-image.registry=ghcr.io
           -Dquarkus.container-image.group=ghcr.io/kuoche1712003

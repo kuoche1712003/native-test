@@ -67,5 +67,5 @@ Easily start your Reactive RESTful Web Services
 
 ## Build Native Image
 ```shell
-./mvnw package -Dnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true -Dquarkus.jib.platforms=linux/arm64
+./mvnw package -Dnative   -Dquarkus.container-image.build=true -Dquarkus.jib.platforms=linux/arm64
 ```
